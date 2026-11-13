@@ -194,8 +194,8 @@ const latest = [...releases].reverse().find(r => r.type !== "F");
   el.innerHTML = `
     <div class="deck-art"></div>
     <div>
-      <div class="lcd"><span class="scroll">TRACK 01 &nbsp;·&nbsp; ${latest.title.toUpperCase()} &nbsp;·&nbsp; ${TYPE_LABEL[latest.type].toUpperCase()} &nbsp;·&nbsp; OUT ${fmtDate(latest.date)} &nbsp;·&nbsp; No.${pad(latest.no)}</span></div>
-      <h3>${latest.title}</h3>
+      <div class="lcd"><span class="scroll" id="deck-lcd"></span></div>
+      <h3 id="deck-title"></h3>
       <p>Out ${fmtDate(latest.date)}. The newest entry in the archive.</p>
       <div class="platforms">
         <a class="btn" href="${latest.appleUrl || "https://music.apple.com/us/artist/yuusef/1548458187"}" target="_blank" rel="noopener">&#9654; APPLE MUSIC</a>
@@ -203,6 +203,9 @@ const latest = [...releases].reverse().find(r => r.type !== "F");
         <a class="btn" href="${latest.scUrl || "https://soundcloud.com/yuu_sef"}" target="_blank" rel="noopener">&#9654; SOUNDCLOUD</a>
       </div>
     </div>`;
+  // titles go in as plain text, never as markup
+  document.getElementById("deck-title").textContent = latest.title;
+  document.getElementById("deck-lcd").textContent = ["TRACK 01", latest.title.toUpperCase(), TYPE_LABEL[latest.type].toUpperCase(), "OUT " + fmtDate(latest.date), "No." + pad(latest.no)].join("  \u00b7  ");
 })();
 
 // ── Archive ──
@@ -711,4 +714,20 @@ document.getElementById("rec").addEventListener("click", () => { if (window.yuBo
   frame();
   const still = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
   if (!still) setInterval(frame, 90);
+})();
+
+
+// PREVIEW · the first-screen play button drives the main player
+(function(){ var b=document.getElementById("hero-play"), p=document.getElementById("p-play"); if(b&&p) b.addEventListener("click", function(){ p.click(); }); })();
+
+// PREVIEW · "next tape" bar: shown only when NEXT_TAPE is filled in (assets/data.js)
+(function(){
+  var cfg = typeof NEXT_TAPE !== "undefined" ? NEXT_TAPE : null;
+  var bar = document.getElementById("next-tape"), t = document.getElementById("nt-title"), b = document.getElementById("nt-btn");
+  if (!cfg || !bar || !t || !b || !cfg.title) return;
+  var when = "";
+  if (cfg.date) { var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(cfg.date); when = m ? m[3] + "." + m[2] + "." + m[1].slice(2) : String(cfg.date); }
+  t.textContent = String(cfg.title).toUpperCase() + (when ? "  \u00b7  " + when : "");   // plain text, never markup
+  if (/^https:\/\//.test(cfg.url || "")) b.href = cfg.url; else b.hidden = true;        // only real https links get a button
+  bar.hidden = false;
 })();

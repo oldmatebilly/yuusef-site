@@ -111,6 +111,7 @@
 </header>
 
 <main>
+  <div class="next-tape" id="next-tape" aria-label="Next release" hidden><div class="wrap"><span class="nt-tag">NEXT TAPE</span><span class="nt-title" id="nt-title"></span><a class="btn btn-primary nt-btn" id="nt-btn" href="#top" target="_blank" rel="noopener">PRE-SAVE</a></div></div>
   <section class="hero" id="top" aria-label="Intro">
     <div class="wrap">
       <div class="cd-stage">
@@ -149,12 +150,13 @@
         <p class="kicker">&#9654; PLAY &mdash; SIDE A</p>
         <h1 class="wordmark" data-text="yuusef">yuusef</h1>
         <p class="lede">Shoegaze, post-punk and gothic alt-rock, made at home in the dark. <b id="lede-count">62 releases</b> since <b>24.08.2023</b>, every one of them below.</p>
+        <button type="button" class="btn btn-primary hero-play" id="hero-play">&#9654; PLAY</button>
         <div class="platforms">
           <a class="btn" href="https://open.spotify.com/artist/3NvrEBUyMRufFB4RCM1Ir4" target="_blank" rel="noopener">SPOTIFY</a>
           <a class="btn" href="https://music.apple.com/us/artist/yuusef/1548458187" target="_blank" rel="noopener">APPLE MUSIC</a>
           <a class="btn" href="https://soundcloud.com/yuu_sef" target="_blank" rel="noopener">SOUNDCLOUD</a>
           <a class="btn" href="https://www.youtube.com/channel/UCXALQO674OZ6x-cvZUeqI1A" target="_blank" rel="noopener">YOUTUBE</a>
-          <a class="btn" href="http://instagram.com/yuu.sef" target="_blank" rel="noopener">INSTAGRAM</a>
+          <a class="btn" href="https://www.instagram.com/yuu.sef/" target="_blank" rel="noopener">INSTAGRAM</a>
         </div>
       </div>
     </div>
@@ -290,7 +292,7 @@
             <li><a href="https://music.apple.com/us/artist/yuusef/1548458187" target="_blank" rel="noopener">APPLE MUSIC</a></li>
             <li><a href="https://soundcloud.com/yuu_sef" target="_blank" rel="noopener">SOUNDCLOUD</a></li>
             <li><a href="https://www.youtube.com/channel/UCXALQO674OZ6x-cvZUeqI1A" target="_blank" rel="noopener">YOUTUBE</a></li>
-            <li><a href="http://instagram.com/yuu.sef" target="_blank" rel="noopener">INSTAGRAM</a></li>
+            <li><a href="https://www.instagram.com/yuu.sef/" target="_blank" rel="noopener">INSTAGRAM</a></li>
           </ul>
           <span class="barcode" aria-hidden="true"></span>
         </div>
@@ -304,6 +306,8 @@
         <h2 class="sec-title" id="gb-title">Guestbook</h2>
         <span class="sec-note" id="gb-count">PIN A NOTE TO THE WALL</span>
       </div>
+
+      <a class="btn btn-primary gb-jump" href="#gb-form">PIN A NOTE &#9660;</a>
 
       <form class="gb-form" id="gb-form" autocomplete="off">
         <label class="gb-label" for="gb-text">YOUR NOTE</label>
@@ -346,7 +350,7 @@
 <footer>
   <div class="wrap">
     <span class="foot-mark">yuusef</span>
-    <div class="foot-logo"><img src="/img/footer-logo.gif" alt="yuusef chrome logo" width="632" height="632"></div>
+    <div class="foot-logo"><img src="/img/footer-logo.gif" alt="yuusef chrome logo" width="632" height="632" loading="lazy" decoding="async"></div>
     <span class="foot-copy">&copy; SORRY4OURSINS LLC</span>
   </div>
 </footer>
