@@ -28,6 +28,8 @@
     Content-Security-Policy-Report-Only = "default-src 'self'; script-src 'self' 'sha256-o3v7Ol40BFQC6+okOiecR1JvgllZStzeMqXFW1jOQHU=' https://w.soundcloud.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://is1-ssl.mzstatic.com https://i1.sndcdn.com https://i.scdn.co; media-src 'self'; font-src 'self'; connect-src 'self' https://wave.sndcdn.com https://mdpmfgewfelvvumldtrh.supabase.co; frame-src https://w.soundcloud.com https://www.youtube-nocookie.com; frame-ancestors 'self'; base-uri 'self'; object-src 'none'; form-action 'self'"
 
 # Fonts never change: cache for a year. Other assets: a week.
+# When site.css, app.js, data.js or guestbook.js change, bump the ?v= number on their tags in index.html
+# (and site.css in 404.html), or returning visitors keep the old file for up to a week.
 [[headers]]
   for = "/assets/fonts/*"
   [headers.values]
