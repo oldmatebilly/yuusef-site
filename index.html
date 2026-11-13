@@ -1,0 +1,375 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>yuusef</title>
+<meta name="description" content="yuusef: shoegaze, post-punk and gothic alt-rock. Every release, video and liner note in one archive.">
+<link rel="canonical" href="https://yuusef.com/">
+<meta name="theme-color" content="#080607">
+<meta name="color-scheme" content="dark">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="yuusef">
+<meta property="og:title" content="yuusef">
+<meta property="og:description" content="Shoegaze, post-punk and gothic alt-rock. Every release, video and liner note in one archive.">
+<meta property="og:url" content="https://yuusef.com/">
+<meta property="og:image" content="https://yuusef.com/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="The yuusef wordmark in chrome blackletter on black">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="yuusef">
+<meta name="twitter:description" content="Shoegaze, post-punk and gothic alt-rock. Every release, video and liner note in one archive.">
+<meta name="twitter:image" content="https://yuusef.com/og.png">
+
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+
+<link rel="preload" href="/assets/fonts/unifrakturmaguntia-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/vt323-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/courier-prime-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/site.css">
+<link rel="preconnect" href="https://is1-ssl.mzstatic.com">
+<link rel="preconnect" href="https://w.soundcloud.com">
+</head>
+<body>
+<div id="boot" aria-hidden="true" hidden>
+  <canvas id="boot-noise" width="160" height="90"></canvas>
+  <div class="boot-track"></div>
+  <div class="boot-osd"><span>PLAY &#9654;</span><span id="boot-tc">SP 00:00:00</span></div>
+  <div class="boot-center">
+    <div class="boot-mark">yuusef</div>
+    <div class="boot-bar"><i></i></div>
+    <div class="boot-load">LOADING TAPE<span class="boot-dots">...</span></div>
+  </div>
+  <div class="boot-skip">CLICK OR PRESS ANY KEY TO SKIP</div>
+</div>
+<script>
+// VHS boot intro: once per visit (session), skippable, never shown if storage is unavailable (previews, thumbnails)
+(function () {
+  const pristine = document.getElementById("boot").cloneNode(true);   // kept so the intro can be replayed
+  let running = false;
+  window.yuBoot = run;
+  let show = false;
+  try { if (!sessionStorage.getItem("yu_boot")) { sessionStorage.setItem("yu_boot", "1"); show = true; } } catch (e) {}
+  if (show) run();
+
+  function run() {
+  if (running) return; running = true;
+  let boot = document.getElementById("boot");
+  if (!boot) { boot = pristine.cloneNode(true); document.body.prepend(boot); }
+  const root = document.documentElement;
+  const reduced = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+  boot.hidden = false; root.classList.add("booting");
+  if (reduced) boot.classList.add("calm");
+  const c = boot.querySelector("#boot-noise"), ctx = c.getContext("2d"), img = ctx.createImageData(c.width, c.height);
+  const noise = () => { for (let i = 0; i < img.data.length; i += 4) { const v = Math.random() * 255; img.data[i] = img.data[i + 1] = img.data[i + 2] = v; img.data[i + 3] = 255; } ctx.putImageData(img, 0, 0); };
+  noise();
+  const tc = boot.querySelector("#boot-tc"), t0 = performance.now();
+  const iv = reduced ? null : setInterval(() => {
+    noise();
+    const f = Math.floor((performance.now() - t0) / 1000 * 30);
+    tc.textContent = "SP 00:00:" + String(Math.floor(f / 30)).padStart(2, "0") + ":" + String(f % 30).padStart(2, "0");
+  }, 70);
+  let done = false;
+  function end() {
+    if (done) return; done = true;
+    boot.classList.add("out");
+    setTimeout(() => { if (iv) clearInterval(iv); boot.remove(); root.classList.remove("booting"); running = false; }, reduced ? 200 : 460);
+    removeEventListener("keydown", end); removeEventListener("pointerdown", end);
+  }
+  // listen for the skip a moment later, so the click that started a replay doesn't also skip it
+  setTimeout(() => { if (!done) { addEventListener("keydown", end); addEventListener("pointerdown", end); } }, 250);
+  setTimeout(end, reduced ? 900 : 2900);
+  }
+})();
+</script>
+
+<canvas id="grain" width="200" height="120" aria-hidden="true"></canvas>
+<div class="scanlines" aria-hidden="true"></div>
+<div class="tracking" aria-hidden="true"></div>
+
+<header class="osd">
+  <div class="wrap">
+    <div class="osd-left">
+      <button type="button" class="rec" id="rec" title="Replay the intro" aria-label="Replay the intro"><i></i>REC</button>
+      <span class="tc" id="tc">SP 00:00:00</span>
+    </div>
+    <a class="osd-mark" href="#top" aria-label="yuusef — back to top"><img src="/img/floppy.gif" alt="yuusef" width="48" height="48"></a>
+    <nav aria-label="Sections">
+      <a href="#top">SOCIALS</a>
+      <a href="#archive">ARCHIVE</a>
+      <a href="#visuals">VISUALS</a>
+      <a href="#about">ABOUT</a>
+      <a href="#guestbook">GUESTBOOK</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="hero" id="top" aria-label="Intro">
+    <div class="wrap">
+      <div class="cd-stage">
+        <div class="cd-wrap">
+          <canvas class="cd-ring" id="cd-ring" aria-hidden="true"></canvas>
+        <button type="button" class="cd" id="cd" aria-label="Play">
+          <span class="cd-art" id="cd-art" aria-hidden="true"></span>
+          <span class="cd-label" aria-hidden="true">
+            <span class="l1">yuusef</span>
+            <span class="l3">do not lose</span>
+            <span class="l2">archive 2023 &ndash; 2026</span>
+          </span>
+          <span class="cd-hole" aria-hidden="true"></span>
+          <span class="cd-hint" id="cd-hint" aria-hidden="true">&#9654;</span>
+        </button>
+        </div>
+        <div class="player" id="player">
+          <div class="lcd"><span class="scroll" id="p-lcd">LOADING DISC…</span></div>
+          <input type="range" id="seek" min="0" max="1000" value="0" aria-label="Position in track">
+          <div class="player-row">
+            <button type="button" class="btn" id="p-play">&#9654; PLAY</button>
+            <button type="button" class="btn" id="p-shuffle">&#8644; SHUFFLE</button>
+            <span class="time" id="p-time">0:00 / 0:00</span>
+          </div>
+          <div class="vol-row">
+            <button type="button" class="btn vol-btn" id="vol-mute" aria-pressed="false" aria-label="Mute">VOL</button>
+            <input type="range" id="vol" min="0" max="100" step="1" value="80" aria-label="Volume">
+            <span class="vol-val" id="vol-val">80</span>
+          </div>
+          <span class="p-note" id="p-note"></span>
+          <div class="sc-host" id="sc-host"></div>
+        </div>
+      </div>
+
+      <div class="hero-copy">
+        <p class="kicker">&#9654; PLAY &mdash; SIDE A</p>
+        <h1 class="wordmark" data-text="yuusef">yuusef</h1>
+        <p class="lede">Shoegaze, post-punk and gothic alt-rock, made at home in the dark. <b id="lede-count">62 releases</b> since <b>24.08.2023</b>, every one of them below.</p>
+        <div class="platforms">
+          <a class="btn" href="https://open.spotify.com/artist/3NvrEBUyMRufFB4RCM1Ir4" target="_blank" rel="noopener">SPOTIFY</a>
+          <a class="btn" href="https://music.apple.com/us/artist/yuusef/1548458187" target="_blank" rel="noopener">APPLE MUSIC</a>
+          <a class="btn" href="https://soundcloud.com/yuu_sef" target="_blank" rel="noopener">SOUNDCLOUD</a>
+          <a class="btn" href="https://www.youtube.com/channel/UCXALQO674OZ6x-cvZUeqI1A" target="_blank" rel="noopener">YOUTUBE</a>
+          <a class="btn" href="http://instagram.com/yuu.sef" target="_blank" rel="noopener">INSTAGRAM</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="strip" aria-label="Catalogue at a glance">
+    <div class="wrap">
+      <div class="stat"><b id="s-total">62</b><span>Releases</span></div>
+      <div class="stat"><b id="s-lp">0</b><span>Spotify plays</span></div>
+      <div class="stat"><b id="s-ep">0</b><span>SoundCloud plays</span></div>
+      <div class="stat"><b id="s-collab">0</b><span>Collaborators</span></div>
+      <div class="stat"><b>8.4K</b><span>Monthly listeners</span></div>
+    </div>
+  </div>
+
+  <section aria-labelledby="np-title">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2 class="sec-title" id="np-title">Now streaming</h2>
+        <span class="sec-note">LATEST TRANSMISSION</span>
+      </div>
+      <div class="deck" id="deck"></div>
+    </div>
+  </section>
+
+  <section id="archive" aria-labelledby="ar-title">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2 class="sec-title" id="ar-title">The archive</h2>
+        <button type="button" class="btn arch-toggle" id="arch-toggle-top" aria-controls="grid" aria-expanded="false">&#9660; SHOW ALL</button>
+      </div>
+      <div class="filters" id="f-type" role="group" aria-label="Filter by release type"></div>
+      <div class="filters years" id="f-year" role="group" aria-label="Filter by year"></div>
+      <div class="filters years" id="f-sort" role="group" aria-label="Sort order"></div>
+      <p class="count" id="count" aria-live="polite"></p>
+      <div class="grid" id="grid"></div>
+      <div class="more-row"><button type="button" class="btn arch-toggle" id="arch-toggle" aria-controls="grid" aria-expanded="false">&#9660; SHOW ALL</button></div>
+    </div>
+  </section>
+
+  <section id="visuals" aria-labelledby="vs-title">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2 class="sec-title" id="vs-title">Visuals</h2>
+        <span class="sec-note" id="vs-note">PICK A TAPE · PRESS PLAY</span>
+      </div>
+
+      <div class="tv" id="tv">
+        <div class="tv-screen">
+          <canvas id="tv-static" width="160" height="120" aria-hidden="true"></canvas>
+          <div class="tv-osd" aria-hidden="true"><span>PLAY &#9654;</span><span id="tv-ch">CH 01</span></div>
+          <div class="tv-card">
+            <span class="tv-kind" id="tv-kind"></span>
+            <h3 class="tv-title" id="tv-title"></h3>
+            <span class="tv-meta" id="tv-meta"></span>
+            <button type="button" class="btn" id="tv-play">&#9654; PLAY TAPE</button>
+            <a class="tv-yt" id="tv-watch" href="https://www.youtube.com/channel/UCXALQO674OZ6x-cvZUeqI1A" target="_blank" rel="noopener">WATCH ON YOUTUBE &#8599;</a>
+          </div>
+        </div>
+        <div class="tv-base">
+          <span class="tv-brand">YUUSEF&middot;VISION</span>
+          <button type="button" class="btn tv-off" id="tv-off" hidden>&#9632; STOP</button>
+          <span class="tv-knobs"><i></i><i></i></span>
+        </div>
+      </div>
+
+      <div class="shelf" id="shelf" role="list"></div>
+      <div class="more-row"><button type="button" class="btn" id="tapes-toggle" aria-controls="shelf" aria-expanded="false">&#9660; SHOW ALL TAPES</button></div>
+    </div>
+  </section>
+
+  <section id="about" aria-labelledby="ab-title">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2 class="sec-title" id="ab-title">About</h2>
+        <span class="sec-note" id="bk-note">TAP THE BOOKLET TO OPEN</span>
+      </div>
+
+      <div class="booklet" id="booklet">
+        <button type="button" class="bk-cover" id="bk-cover" aria-label="Open the liner notes booklet">
+          <video class="bk-video" id="bk-video" muted loop playsinline preload="metadata" poster="media/booklet-poster.jpg" aria-hidden="true"><source src="media/booklet-loop.webm" type="video/webm"><source src="media/booklet-loop.mp4" type="video/mp4"></video>
+          <span class="bk-shade" aria-hidden="true"></span>
+          <span class="bk-dots" aria-hidden="true"></span>
+          <span class="bk-cover-top">LINER NOTES</span>
+          <span class="bk-cover-title">yuusef</span>
+          <span class="bk-cover-sub">ARCHIVE 2023 &ndash; 2026</span>
+          <span class="bk-open">OPEN &#9654;</span>
+        </button>
+        <div class="bk-spread" id="bk-spread" hidden>
+          <div class="bk-page" id="bk-left"></div>
+          <div class="bk-page" id="bk-right"></div>
+          <span class="bk-fold" aria-hidden="true"></span>
+        </div>
+      </div>
+      <div class="bk-controls" id="bk-controls" hidden>
+        <button type="button" class="btn" id="bk-prev">&#9664; PREV</button>
+        <span class="bk-pageno" id="bk-pageno" aria-live="polite"></span>
+        <button type="button" class="btn" id="bk-next">NEXT &#9654;</button>
+        <button type="button" class="btn" id="bk-close">&#10005; CLOSE</button>
+      </div>
+
+      <template id="bk-pages">
+        <div class="pg pg-photo">
+          <span class="pg-kicker">i.</span>
+          <img class="pg-photo-img" src="img/yuusef-photo.jpg" alt="yuusef leaning against a stained concrete wall" width="900" height="900" loading="lazy">
+          <div class="pg-overlay">
+            <h3 class="pg-title">yuusef</h3>
+            <p class="pg-bio">i make music for 3am. shoegaze walls, post-punk drums, a voice half-buried in the noise.</p>
+          </div>
+        </div>
+        <div class="pg">
+          <span class="pg-kicker">ii.</span>
+          <h3 class="pg-title">Credits</h3>
+          <dl class="bk-credits">
+            <dt>WRITTEN, PRODUCED &amp; MASTERED</dt><dd>yuusef, in FL Studio</dd>
+            <dt>FIRST STREAMING RELEASE</dt><dd>when i died in tokyo &middot; 24.08.2023</dd>
+            <dt>ALBUMS</dt><dd>solitude (2024)<br>a f t e r l i f e (2026)</dd>
+            <dt>EPs</dt><dd>seeing through the ceiling (2025)<br>dystopia_ (2025)</dd>
+            <dt>&copy;</dt><dd>SORRY4OURSINS LLC</dd>
+          </dl>
+        </div>
+        <div class="pg">
+          <span class="pg-kicker">iii.</span>
+          <h3 class="pg-title">With</h3>
+          <p class="pg-small">Everyone I&rsquo;ve shared a credit with.</p>
+          <ul class="bk-names" id="bk-names"></ul>
+        </div>
+        <div class="pg pg-back">
+          <span class="pg-kicker">iv.</span>
+          <h3 class="pg-title">Listen</h3>
+          <ul class="bk-links">
+            <li><a href="https://open.spotify.com/artist/3NvrEBUyMRufFB4RCM1Ir4" target="_blank" rel="noopener">SPOTIFY</a></li>
+            <li><a href="https://music.apple.com/us/artist/yuusef/1548458187" target="_blank" rel="noopener">APPLE MUSIC</a></li>
+            <li><a href="https://soundcloud.com/yuu_sef" target="_blank" rel="noopener">SOUNDCLOUD</a></li>
+            <li><a href="https://www.youtube.com/channel/UCXALQO674OZ6x-cvZUeqI1A" target="_blank" rel="noopener">YOUTUBE</a></li>
+            <li><a href="http://instagram.com/yuu.sef" target="_blank" rel="noopener">INSTAGRAM</a></li>
+          </ul>
+          <span class="barcode" aria-hidden="true"></span>
+        </div>
+      </template>
+    </div>
+  </section>
+
+  <section id="guestbook" aria-labelledby="gb-title">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2 class="sec-title" id="gb-title">Guestbook</h2>
+        <span class="sec-note" id="gb-count">PIN A NOTE TO THE WALL</span>
+      </div>
+
+      <form class="gb-form" id="gb-form" autocomplete="off">
+        <label class="gb-label" for="gb-text">YOUR NOTE</label>
+        <textarea id="gb-text" maxlength="200" rows="3" placeholder="What's on your mind?" required></textarea>
+        <div class="gb-row">
+          <div class="gb-name-wrap">
+            <label class="gb-label" for="gb-name">NAME (OPTIONAL)</label>
+            <input id="gb-name" type="text" maxlength="24" placeholder="anon">
+          </div>
+          <fieldset class="gb-colors" aria-label="Note colour">
+            <legend class="gb-label">PAPER</legend>
+            <label><input type="radio" name="gb-color" id="gb-c-bone" value="bone" checked><span class="sw sw-bone"></span></label>
+            <label><input type="radio" name="gb-color" id="gb-c-blood" value="blood"><span class="sw sw-blood"></span></label>
+            <label><input type="radio" name="gb-color" id="gb-c-chrome" value="chrome"><span class="sw sw-chrome"></span></label>
+            <label><input type="radio" name="gb-color" id="gb-c-xerox" value="xerox"><span class="sw sw-xerox"></span></label>
+            <label><input type="radio" name="gb-color" id="gb-c-pink" value="pink"><span class="sw sw-pink"></span></label>
+            <label><input type="radio" name="gb-color" id="gb-c-cyan" value="cyan"><span class="sw sw-cyan"></span></label>
+            <label><input type="radio" name="gb-color" id="gb-c-yellow" value="yellow"><span class="sw sw-yellow"></span></label>
+            <label><input type="radio" name="gb-color" id="gb-c-lilac" value="lilac"><span class="sw sw-lilac"></span></label>
+            <label><input type="radio" name="gb-color" id="gb-c-orange" value="orange"><span class="sw sw-orange"></span></label>
+            <label><input type="radio" name="gb-color" id="gb-c-lime" value="lime"><span class="sw sw-lime"></span></label>
+          </fieldset>
+          <div class="gb-submit">
+            <span class="gb-chars" id="gb-chars">0 / 200</span>
+            <button type="submit" class="btn" id="gb-pin">PIN IT &#10022;</button>
+          </div>
+        </div>
+        <p class="gb-msg" id="gb-msg" role="status" aria-live="polite"></p>
+      </form>
+
+      <div class="wall" id="wall" aria-live="polite">
+        <p class="wall-empty" id="wall-empty">LOADING THE WALL…</p>
+      </div>
+      <div class="more-row"><button type="button" class="btn" id="gb-more" hidden>&#9660; OLDER NOTES</button></div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <span class="foot-mark">yuusef</span>
+    <div class="foot-logo"><img src="/img/footer-logo.gif" alt="yuusef chrome logo" width="632" height="632"></div>
+    <span class="foot-copy">&copy; SORRY4OURSINS LLC</span>
+  </div>
+</footer>
+
+<div class="mini" id="mini" aria-hidden="true" aria-label="Now playing">
+  <div class="mini-progress"><i id="mini-bar"></i></div>
+  <div class="mini-in">
+    <button type="button" class="mini-disc" id="mini-disc" aria-label="Back to the main player"><span class="mini-art" id="mini-art"></span><span class="mini-hole"></span></button>
+    <div class="mini-meta">
+      <span class="mini-title" id="mini-title"></span>
+      <span class="mini-time" id="mini-time">0:00 / 0:00</span>
+    </div>
+    <div class="mini-vol">
+      <button type="button" class="btn mini-btn mini-mute" id="mini-mute" aria-pressed="false" aria-label="Mute">VOL</button>
+      <input type="range" id="mini-vol" min="0" max="100" step="1" value="80" aria-label="Volume">
+    </div>
+    <button type="button" class="btn mini-btn" id="mini-play" aria-label="Play">&#9654;</button>
+    <button type="button" class="btn mini-btn" id="mini-skip" aria-label="Skip to another track">&#9197;</button>
+  </div>
+</div>
+
+<script src="/assets/data.js"></script>
+<script src="/assets/app.js"></script>
+<script src="/assets/guestbook.js"></script>
+</body>
+</html>
