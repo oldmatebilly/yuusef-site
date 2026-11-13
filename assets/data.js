@@ -1,5 +1,11 @@
 /* yuusef.com — catalogue data (snapshot 25 Oct 2026). Edit here to add releases, plays or videos. */
 
+/* ── Next release banner ("NEXT TAPE" bar under the menu) ──
+   Leave as null and the bar stays hidden. When a release is locked in, replace null with:
+     { title: "song title", date: "2026-12-05", url: "https://your-presave-link" }
+   The PRE-SAVE button opens the url. Set it back to null on release day. */
+const NEXT_TAPE = null;
+
 // ── Catalogue (from the Apple Music catalogue, Oct 2026) ──
 // [date, title, artists, type, tracks, appleId]  type: A album, E EP, S single, F feature on someone else's release
 const RAW = [
