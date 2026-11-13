@@ -495,23 +495,6 @@ html.booting { overflow: hidden; }
 #boot.calm .boot-bar i { width: 100%; }
 #boot.calm.out { animation: none; opacity: 0; transition: opacity 0.2s; }
 
-/* intro tape: cuts in after the loading bar */
-.boot-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; background: #000; z-index: 1; opacity: 0; pointer-events: none; }
-#boot.intro-on .boot-video { opacity: 1; animation: tapein 0.5s steps(5); }
-#boot.intro-on .boot-center, #boot.intro-on #boot-noise, #boot.intro-on .boot-track, #boot.intro-on .boot-skip { display: none; }
-@keyframes tapein { 0% { opacity: 0; transform: skewX(-12deg) scaleY(0.2); filter: contrast(2) brightness(1.6); } 60% { opacity: 1; transform: skewX(4deg); } 100% { transform: none; filter: none; } }
-.boot-ctrl {
-  position: absolute; z-index: 4; bottom: calc(20px + env(safe-area-inset-bottom, 0px));
-  left: max(16px, env(safe-area-inset-left, 0px)); right: max(16px, env(safe-area-inset-right, 0px));
-  display: flex; justify-content: space-between; gap: 12px;
-}
-.boot-btn {
-  font-family: var(--f-ui); font-size: clamp(18px, 2.6vw, 24px); letter-spacing: 0.1em; color: #e8ffe8;
-  background: rgba(0,0,0,0.6); border: 1px solid rgba(232,255,232,0.65); padding: 4px 12px 2px; cursor: pointer;
-  text-shadow: 0 0 6px rgba(160,255,160,0.6);
-}
-.boot-btn:hover, .boot-btn:focus-visible { background: rgba(232,255,232,0.15); outline: none; }
-
 /* ── Visuals: CRT set + VHS shelf ──────────────── */
 .tv {
   max-width: 760px; margin: 0 auto 34px;

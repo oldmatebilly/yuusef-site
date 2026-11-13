@@ -49,9 +49,7 @@
   <div class="boot-skip">CLICK OR PRESS ANY KEY TO SKIP</div>
 </div>
 <script>
-// VHS boot intro: once per visit (session), skippable, never shown if storage is unavailable (previews, thumbnails).
-// After the loading bar the intro tape cuts in and plays /media/intro.mp4: muted until tapped (browsers block sound
-// before a tap), skippable any time. Skipped for reduced motion, data saver, or if the video can't load in time.
+// VHS boot intro: once per visit (session), skippable, never shown if storage is unavailable (previews, thumbnails)
 (function () {
   const pristine = document.getElementById("boot").cloneNode(true);   // kept so the intro can be replayed
   let running = false;
@@ -78,54 +76,15 @@
     tc.textContent = "SP 00:00:" + String(Math.floor(f / 30)).padStart(2, "0") + ":" + String(f % 30).padStart(2, "0");
   }, 70);
   let done = false;
-  const wantTape = !reduced && !(navigator.connection && navigator.connection.saveData);
-  let vid = null;
-  if (wantTape) {
-    vid = document.createElement("video");
-    vid.className = "boot-video";
-    vid.muted = true; vid.playsInline = true; vid.preload = "auto";
-    vid.setAttribute("muted", ""); vid.setAttribute("playsinline", "");
-    vid.poster = "/media/intro-poster.jpg"; vid.src = "/media/intro.mp4";
-    vid.addEventListener("ended", end);
-    vid.addEventListener("error", () => { if (boot.classList.contains("intro-on")) end(); });
-    boot.appendChild(vid);
-  }
-  function startTape() {
-    if (done || boot.classList.contains("intro-on")) return;
-    if (!vid || vid.error) return end();
-    boot.classList.add("intro-on");
-    const ctrl = document.createElement("div");
-    ctrl.className = "boot-ctrl";
-    ctrl.innerHTML = '<button type="button" class="boot-btn" data-act="sound">&#128264; TAP FOR SOUND</button><button type="button" class="boot-btn" data-act="skip">SKIP &#9654;&#9654;</button>';
-    boot.appendChild(ctrl);
-    const snd = ctrl.querySelector('[data-act="sound"]');
-    snd.addEventListener("click", () => {
-      vid.muted = !vid.muted;
-      if (!vid.muted && vid.paused) vid.play().catch(() => {});
-      snd.innerHTML = vid.muted ? "&#128264; TAP FOR SOUND" : "&#128266; SOUND ON";
-    });
-    const p = vid.play();
-    if (p && p.catch) p.catch(() => end());
-  }
-  function onSkip(e) {
-    if (e && e.target && e.target.closest && e.target.closest('[data-act="sound"]')) return;   // the sound button doesn't skip
-    end();
-  }
   function end() {
     if (done) return; done = true;
-    if (vid) { try { vid.pause(); } catch (e) {} }
     boot.classList.add("out");
     setTimeout(() => { if (iv) clearInterval(iv); boot.remove(); root.classList.remove("booting"); running = false; }, reduced ? 200 : 460);
-    removeEventListener("keydown", onSkip); removeEventListener("pointerdown", onSkip);
+    removeEventListener("keydown", end); removeEventListener("pointerdown", end);
   }
   // listen for the skip a moment later, so the click that started a replay doesn't also skip it
-  setTimeout(() => { if (!done) { addEventListener("keydown", onSkip); addEventListener("pointerdown", onSkip); } }, 250);
-  setTimeout(() => {
-    if (!vid) return end();
-    if (vid.readyState >= 3) return startTape();
-    vid.addEventListener("canplay", startTape, { once: true });
-    setTimeout(() => { if (!boot.classList.contains("intro-on")) end(); }, 4000);   // slow connection: don't hold the site hostage
-  }, reduced ? 900 : 2900);
+  setTimeout(() => { if (!done) { addEventListener("keydown", end); addEventListener("pointerdown", end); } }, 250);
+  setTimeout(end, reduced ? 900 : 2900);
   }
 })();
 </script>
