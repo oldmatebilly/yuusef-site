@@ -16,6 +16,20 @@
   to = "/"
   status = 301
 
+# Short links for pitch emails and the press kit
+[[redirects]]
+  from = "/wav"
+  to = "https://drive.google.com/drive/folders/1AyVbHHNLnuU982hqcFl6XabGzFLzR94M"
+  status = 302
+[[redirects]]
+  from = "/photos"
+  to = "https://drive.google.com/drive/folders/1TlxIfAH1mJwTFGMWV-e52uQanWWtKcQm"
+  status = 302
+[[redirects]]
+  from = "/spotify"
+  to = "https://open.spotify.com/artist/3NvrEBUyMRufFB4RCM1Ir4"
+  status = 302
+
 [[headers]]
   for = "/*"
   [headers.values]
