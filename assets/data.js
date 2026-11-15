@@ -57,7 +57,7 @@ const RAW = [
 ["2025-09-19","the last ride","AkiraDoves, yuusef & franc!s","S",1,"1836637786"],
 ["2025-09-25","are you sure?","yuusef, Sence & LMG","S",1,"1837584714"],
 ["2025-09-26","I Still Miss You (feat. yuusef)","sKelter pLus","F",1,""],
-["2025-10-09","how to love again","yuusef, Bre & Aprils Ghost","S",1,"1838412314"],
+["2025-10-09","how to love again","yuusef, bre & Aprils Ghost","S",1,"1838412314"],
 ["2025-11-21","don't wanna feel anymore","yuusef","S",1,"1853591298"],
 ["2025-12-19","tone","AkiraDoves, yuusef & franc!s","S",2,"1859812953"],
 ["2025-12-26","moon song","ICWYTE & yuusef","S",1,"1861629732"],
