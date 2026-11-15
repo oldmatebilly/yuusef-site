@@ -14,6 +14,8 @@
 .epk-bio { max-width: 64ch; text-transform: lowercase; color: var(--bone); font-size: 16px; }
 .epk-bio p { margin: 0 0 14px; }
 .epk-bio .dim { color: var(--dim); }
+/* other artists keep the capitalisation they release under */
+.epk-bio .nm, .epk-track .nm { text-transform: none; }
 
 .epk-tracks { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
 .epk-track { background: var(--panel); border: 1px solid var(--line); display: flex; flex-direction: column; }
