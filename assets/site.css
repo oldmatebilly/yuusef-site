@@ -910,8 +910,8 @@ img { max-width: 100%; }
   .nt-title { order: 3; flex: 1 1 100%; white-space: normal; overflow: visible; }
 }
 
-/* ═══════════ Hidden extra: Disc Snake (assets/snake.js). Opens after 5 taps on the player's display. ═══════════ */
-.player .lcd { cursor: default; -webkit-tap-highlight-color: transparent; user-select: none; }
+/* ═══════════ Hidden extra: Disc Snake (assets/snake.js). Opens after 5 taps on the spinning CD. ═══════════ */
+.cd { -webkit-tap-highlight-color: transparent; user-select: none; }
 html.snk-open { overflow: hidden; }
 .snk {
   position: fixed; inset: 0; z-index: 90; display: grid; place-items: center;

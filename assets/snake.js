@@ -1,25 +1,25 @@
 // ── Hidden extra: Snake on the CD player's display ──
-// Tap the player's red display 5 times to open it. The snake eats CDs; every 3rd CD plays a
-// short snippet of a released song (from SoundCloud, at the song's loudest section).
+// Tap the spinning CD 5 times to open it. The snake eats CDs: the 1st CD starts a released song
+// at its loudest section, and every 3rd CD after that (4th, 7th, 10th …) switches to a new one.
 // Scores go to the leaderboard in Supabase through submit_score(), which re-checks names,
 // rate limits and impossible scores on the database side.
 (function snake() {
   "use strict";
-  const lcdBox = document.querySelector(".player .lcd");
-  if (!lcdBox) return;
+  const disc = document.getElementById("cd");
+  if (!disc) return;
 
   // ── settings ──
   // phones get a taller board that fits a portrait screen
   const PORTRAIT = window.matchMedia && matchMedia("(max-width: 600px)").matches;
   const COLS = PORTRAIT ? 15 : 21, ROWS = PORTRAIT ? 19 : 15;
   const TICK_START = 150, TICK_MIN = 75, TICK_STEP = 3;   // ms per move; speeds up with each CD
-  const SNIPPET_EVERY = 3, SNIPPET_MS = 1200;
+  const SONG_EVERY = 3;   // CD 1 starts a song, then every 3rd CD (4, 7, 10 …) changes it
   const API = "https://mdpmfgewfelvvumldtrh.supabase.co/rest/v1";
   const KEY = "sb_publishable_ELUfzX1gFHSOnBcsI0r3yA_0LFmnopH";
   const H = { apikey: KEY, "Content-Type": "application/json" };
   if (KEY.startsWith("eyJ")) H.Authorization = "Bearer " + KEY;
 
-  // released songs: [SoundCloud slug, hook position in seconds, title on the display]
+  // released songs: [SoundCloud slug, loudest-section position in seconds, title on the display]
   // hook = start of the loudest section in the "yuusef library index (songs)" sheet, plus 6 s
   const SNIPS = [
     ["dont-ever-say-that-its-all-good", 43, "DONT EVER SAY THAT ITS ALL GOOD"],
@@ -51,9 +51,9 @@
     DAILY_LIMIT: "THAT'S ENOUGH SCORES FOR TODAY.",
   };
 
-  // ── 5 taps on the display opens it ──
+  // ── 5 taps on the CD opens it ──
   let taps = 0, tapTimer = 0;
-  lcdBox.addEventListener("click", () => {
+  disc.addEventListener("click", () => {
     taps++; clearTimeout(tapTimer);
     tapTimer = setTimeout(() => { taps = 0; }, 1600);
     if (taps >= 5) { taps = 0; open(); }
@@ -82,7 +82,7 @@
           <canvas id="snk-cv" width="${COLS * 16}" height="${ROWS * 16}" aria-label="Game screen"></canvas>
           <div class="snk-card" id="snk-start">
             <p class="snk-big">DISC SNAKE</p>
-            <p>EAT THE CDS. EVERY 3RD ONE PLAYS A SECOND OF A SONG.</p>
+            <p>EAT THE CDS. THE FIRST ONE STARTS A SONG, EVERY 3RD ONE AFTER THAT CHANGES IT.</p>
             <p class="snk-dim">ARROWS / WASD &middot; SWIPE OR USE THE PAD ON PHONES &middot; SPACE PAUSES</p>
             <button type="button" class="btn btn-primary snk-go" data-act="start">&#9654; START</button>
             <ol class="snk-board" id="snk-board-start"></ol>
@@ -148,7 +148,7 @@
     if (isOpen) return;
     isOpen = true;
     lastFocus = document.activeElement;
-    // pause the main player so snippets don't clash; the visitor resumes it afterwards
+    // pause the main player so the game's songs don't clash; the visitor resumes it afterwards
     const cd = document.getElementById("cd"), playBtn = document.getElementById("p-play");
     if (cd && cd.classList.contains("playing") && playBtn) playBtn.click();
     root.hidden = false;
@@ -156,7 +156,7 @@
     addEventListener("keydown", onKey, true);
     state = "idle"; showCard(startEl); draw(); say("TAP START");
     loadBoard($("#snk-board-start"));
-    initSnippets();
+    initDecks();
     setTimeout(() => $('[data-act="start"]', startEl).focus(), 30);
   }
   function close() {
@@ -166,7 +166,7 @@
     root.hidden = true;
     document.documentElement.classList.remove("snk-open");
     removeEventListener("keydown", onKey, true);
-    if (sw && swReady) { try { sw.pause(); } catch (e) {} }
+    stopMusic();
     if (lastFocus && lastFocus.focus) lastFocus.focus();
   }
   document.addEventListener("visibilitychange", () => { if (document.hidden && state === "play") togglePause(); });
@@ -184,6 +184,7 @@
     const cy = Math.floor(ROWS / 2);
     body = [[6, cy], [5, cy], [4, cy]];
     dir = "right"; queue = []; score = 0; tick = TICK_START; playedMs = 0; submitted = false;
+    stopMusic();
     scoreEl.textContent = "0";
     placeFood();
     showCard(null);
@@ -194,8 +195,8 @@
   }
   function stopLoop() { clearTimeout(timer); timer = 0; }
   function togglePause() {
-    if (state === "play") { state = "pause"; playedMs += performance.now() - lastStamp; stopLoop(); say("PAUSED · SPACE OR II TO GO ON"); draw(); }
-    else if (state === "pause") { state = "play"; lastStamp = performance.now(); say("GO"); timer = setTimeout(step, tick); }
+    if (state === "play") { state = "pause"; playedMs += performance.now() - lastStamp; stopLoop(); say("PAUSED · SPACE OR II TO GO ON"); draw(); if (live) live.w.pause(); }
+    else if (state === "pause") { state = "play"; lastStamp = performance.now(); say("GO"); timer = setTimeout(step, tick); if (live) live.w.play(); }
   }
   function turn(d) {
     if (state === "idle" || state === "over") return;
@@ -222,7 +223,7 @@
     if (eats) {
       score++; scoreEl.textContent = String(score);
       tick = Math.max(TICK_MIN, tick - TICK_STEP);
-      if (score % SNIPPET_EVERY === 0) playSnippet(); else say("CD " + score);
+      if ((score - 1) % SONG_EVERY === 0) changeSong(); else say(live ? "CD " + score + " · \u266A " + live.song[2] : "CD " + score);
       placeFood();
     } else body.pop();
     draw();
@@ -280,33 +281,25 @@
     if (k === " ") { e.preventDefault(); if (state === "idle" || state === "over") start(); else togglePause(); }
   }
 
-  // ── song snippets through a hidden SoundCloud player ──
-  // The next snippet is loaded in advance; when it's time, it plays muted, jumps to the hook,
-  // then unmutes for about a second. Some phones block this; the display still shows the title.
-  let sw = null, swReady = false, snipOrder = [], snipNext = null, snipPhase = "idle", snipTimer = 0;
-  function initSnippets() {
-    if (sw) return;
-    const go = () => {
-      const host = document.createElement("div");
-      host.className = "snk-sc";
-      const f = document.createElement("iframe");
-      f.allow = "autoplay"; f.title = "snippet player"; f.tabIndex = -1;
-      snipNext = nextSnip();
-      f.src = "https://w.soundcloud.com/player/?url=" + encodeURIComponent("https://soundcloud.com/yuu_sef/" + snipNext[0]) +
-              "&auto_play=false&visual=false&show_artwork=false&show_comments=false&show_user=false&show_reposts=false&show_teaser=false&hide_related=true&buying=false&sharing=false&download=false";
-      host.appendChild(f); document.body.appendChild(host);
-      sw = SC.Widget(f);
-      const E = SC.Widget.Events;
-      sw.bind(E.READY, () => { swReady = true; });
-      sw.bind(E.PLAY, () => { if (snipPhase === "seeking") sw.seekTo(snipNext[1] * 1000); });
-      sw.bind(E.PLAY_PROGRESS, ev => {
-        if (snipPhase !== "seeking" || ev.currentPosition < snipNext[1] * 1000 - 400) return;
-        snipPhase = "playing";
-        sw.setVolume(volume());
-        clearTimeout(snipTimer);
-        snipTimer = setTimeout(endSnippet, SNIPPET_MS);
-      });
-    };
+  // ── soundtrack: two hidden SoundCloud players take turns ──
+  // The next song is always waiting in the spare player. When it's due, the spare starts muted,
+  // jumps to the song's loudest section, unmutes, and the old song stops, so there's no gap.
+  // Some phones block sound started this way; the display still shows the title.
+  const SC_OPTS = { auto_play: false, visual: false, show_artwork: false, show_comments: false, show_user: false,
+                    show_reposts: false, show_teaser: false, hide_related: true, buying: false, sharing: false, download: false };
+  const scUrl = song => "https://soundcloud.com/yuu_sef/" + song[0];
+  let decks = [], live = null, order = [], pending = false;
+  function nextSong() {
+    if (!order.length) order = SNIPS.slice().sort(() => Math.random() - 0.5);
+    return order.pop();
+  }
+  function volume() {
+    try { const v = parseInt(localStorage.getItem("yu_vol"), 10); if (v >= 0 && v <= 100) return Math.max(v, 40); } catch (e) {}
+    return 80;
+  }
+  function initDecks() {
+    if (decks.length) return;
+    const go = () => { decks = [makeDeck(nextSong()), makeDeck(nextSong())]; };
     if (window.SC && SC.Widget) go();
     else {
       const s = document.createElement("script");
@@ -314,35 +307,53 @@
       document.head.appendChild(s);
     }
   }
-  function nextSnip() {
-    if (!snipOrder.length) snipOrder = SNIPS.slice().sort(() => Math.random() - 0.5);
-    return snipOrder.pop();
-  }
-  function volume() {
-    try { const v = parseInt(localStorage.getItem("yu_vol"), 10); if (v >= 0 && v <= 100) return Math.max(v, 40); } catch (e) {}
-    return 80;
-  }
-  function playSnippet() {
-    if (!snipNext) return say("CD " + score);
-    say("CD " + score + " · ♪ " + snipNext[2]);
-    if (!sw || !swReady || snipPhase !== "idle") return;
-    snipPhase = "seeking";
-    sw.setVolume(0);
-    sw.play();
-    clearTimeout(snipTimer);
-    snipTimer = setTimeout(endSnippet, 5000);   // give up if it never starts
-  }
-  function endSnippet() {
-    clearTimeout(snipTimer);
-    if (!sw) return;
-    try { sw.pause(); sw.setVolume(0); } catch (e) {}
-    snipPhase = "loading";
-    snipNext = nextSnip();
-    sw.load("https://soundcloud.com/yuu_sef/" + snipNext[0], {
-      auto_play: false, visual: false, show_artwork: false, show_comments: false, show_user: false,
-      show_reposts: false, show_teaser: false, hide_related: true, buying: false, sharing: false, download: false,
-      callback: () => { snipPhase = "idle"; }
+  function makeDeck(song) {
+    const host = document.createElement("div");
+    host.className = "snk-sc";
+    const f = document.createElement("iframe");
+    f.allow = "autoplay"; f.title = "game soundtrack"; f.tabIndex = -1;
+    f.src = "https://w.soundcloud.com/player/?url=" + encodeURIComponent(scUrl(song)) + "&" +
+            Object.entries(SC_OPTS).map(([k, v]) => k + "=" + v).join("&");
+    host.appendChild(f); document.body.appendChild(host);
+    const d = { w: SC.Widget(f), song, ready: false, phase: "idle", used: false, timer: 0 };   // phase: idle | starting | on
+    const E = SC.Widget.Events;
+    d.w.bind(E.READY, () => { d.ready = true; if (pending) changeSong(); });
+    d.w.bind(E.PLAY, () => { if (d.phase === "starting") d.w.seekTo(d.song[1] * 1000); });
+    d.w.bind(E.PLAY_PROGRESS, ev => {
+      if (d.phase !== "starting" || ev.currentPosition < d.song[1] * 1000 - 400) return;
+      clearTimeout(d.timer);
+      d.phase = "on"; d.used = true;
+      d.w.setVolume(volume());
+      if (live && live !== d) quiet(live);
+      live = d;
+      const other = decks.find(x => x !== d);
+      if (other && other.used) reload(other);
     });
+    return d;
+  }
+  function quiet(d) {
+    clearTimeout(d.timer);
+    try { d.w.pause(); d.w.setVolume(0); } catch (e) {}
+    d.phase = "idle";
+  }
+  function reload(d) {
+    d.ready = false; d.used = false; d.song = nextSong();
+    d.w.load(scUrl(d.song), Object.assign({}, SC_OPTS, { callback: () => { d.ready = true; if (pending) changeSong(); } }));
+  }
+  function changeSong() {
+    const spare = decks.find(d => d !== live && d.ready && !d.used && d.phase === "idle");
+    if (!spare || state !== "play") { pending = !!decks.length && state === "play"; say("CD " + score); return; }
+    pending = false;
+    say("CD " + score + " · \u266A " + spare.song[2]);
+    spare.phase = "starting";
+    spare.w.setVolume(0);
+    spare.w.play();
+    spare.timer = setTimeout(() => { if (spare.phase === "starting") quiet(spare); }, 6000);   // blocked or slow: keep the old song
+  }
+  function stopMusic() {
+    pending = false;
+    decks.forEach(quiet);
+    if (live) { const old = live; live = null; reload(old); }
   }
 
   // ── leaderboard ──
