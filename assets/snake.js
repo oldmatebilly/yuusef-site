@@ -1,6 +1,6 @@
 // ── Hidden extra: Snake on the CD player's display ──
 // Tap the spinning CD 5 times to open it. The snake eats CDs: the 1st CD starts a released song
-// at its loudest section, and every 3rd CD after that (4th, 7th, 10th …) switches to a new one.
+// at its loudest section, and every 5th CD after that (6th, 11th, 16th …) switches to a new one.
 // Scores go to the leaderboard in Supabase through submit_score(), which re-checks names,
 // rate limits and impossible scores on the database side.
 (function snake() {
@@ -13,7 +13,7 @@
   const PORTRAIT = window.matchMedia && matchMedia("(max-width: 600px)").matches;
   const COLS = PORTRAIT ? 15 : 21, ROWS = PORTRAIT ? 19 : 15;
   const TICK_START = 150, TICK_MIN = 75, TICK_STEP = 3;   // ms per move; speeds up with each CD
-  const SONG_EVERY = 3;   // CD 1 starts a song, then every 3rd CD (4, 7, 10 …) changes it
+  const SONG_EVERY = 5;   // CD 1 starts a song, then every 5th CD after it (6, 11, 16 …) changes it
   const API = "https://mdpmfgewfelvvumldtrh.supabase.co/rest/v1";
   const KEY = "sb_publishable_ELUfzX1gFHSOnBcsI0r3yA_0LFmnopH";
   const H = { apikey: KEY, "Content-Type": "application/json" };
@@ -82,7 +82,7 @@
           <canvas id="snk-cv" width="${COLS * 16}" height="${ROWS * 16}" aria-label="Game screen"></canvas>
           <div class="snk-card" id="snk-start">
             <p class="snk-big">DISC SNAKE</p>
-            <p>EAT THE CDS. THE FIRST ONE STARTS A SONG, EVERY 3RD ONE AFTER THAT CHANGES IT.</p>
+            <p>EAT THE CDS. THE FIRST ONE STARTS A SONG, EVERY 5 AFTER THAT CHANGE IT.</p>
             <p class="snk-dim">ARROWS / WASD &middot; SWIPE OR USE THE PAD ON PHONES &middot; SPACE PAUSES</p>
             <button type="button" class="btn btn-primary snk-go" data-act="start">&#9654; START</button>
             <ol class="snk-board" id="snk-board-start"></ol>
