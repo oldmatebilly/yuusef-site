@@ -146,8 +146,8 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .cd-caption { margin-top: 18px; font-family: var(--f-ui); font-size: 18px; color: var(--dim); letter-spacing: 0.08em; text-align: center; }
 
 /* disc as a play button: spins only while playing */
-button.cd { border: 0; padding: 0; cursor: pointer; display: block; animation-play-state: paused; }
-button.cd.playing { animation-play-state: running; }
+.cd { border: 0; padding: 0; display: block; animation-play-state: paused; }   /* decoration only: spins while music plays */
+.cd.playing { animation-play-state: running; }
 .cd-art { position: absolute; inset: 0; border-radius: 50%; overflow: hidden; }
 .cd-art canvas, .cd-art img { width: 100%; height: 100%; display: block; object-fit: cover; }
 .cd-art::after { /* CD-R sheen over the printed cover */
@@ -162,17 +162,6 @@ button.cd.playing { animation-play-state: running; }
   box-shadow: 0 0 0 9px rgba(220,223,228,0.88), 0 0 0 10px rgba(120,125,132,0.8);
 }
 .cd.has-art .cd-label { display: none; }
-.cd-hint {
-  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
-  width: 26%; aspect-ratio: 1; border-radius: 50%;
-  display: grid; place-items: center;
-  background: rgba(8,6,7,0.78); color: var(--bone);
-  font-family: var(--f-ui); font-size: clamp(22px, 5vw, 34px);
-  box-shadow: 0 0 0 1px rgba(255,255,255,0.25);
-  transition: opacity 0.3s;
-}
-.cd.playing .cd-hint { opacity: 0; }
-.cd:hover .cd-hint, .cd:focus-visible .cd-hint { opacity: 1; }
 
 .player { width: min(360px, 78vw); max-width: 100%; margin-top: 20px; display: flex; flex-direction: column; gap: 8px; font-family: var(--f-ui); }
 .player .lcd { font-size: 20px; }
@@ -920,3 +909,67 @@ img { max-width: 100%; }
   .nt-btn { margin-left: auto; }
   .nt-title { order: 3; flex: 1 1 100%; white-space: normal; overflow: visible; }
 }
+
+/* ═══════════ Hidden extra: Disc Snake (assets/snake.js). Opens after 5 taps on the spinning CD. ═══════════ */
+.cd { -webkit-tap-highlight-color: transparent; user-select: none; }
+html.snk-open { overflow: hidden; }
+.snk {
+  position: fixed; inset: 0; z-index: 90; display: grid; place-items: center;
+  background: rgba(8,6,7,0.86); padding: max(12px, env(safe-area-inset-top, 0px)) 12px max(12px, env(safe-area-inset-bottom, 0px));
+  font-family: var(--f-ui); color: var(--bone);
+}
+.snk[hidden] { display: none; }
+.snk-box {
+  width: min(560px, 100%); display: flex; flex-direction: column; gap: 10px;
+  background: linear-gradient(180deg, #1a1618, #0d0b0c); border: 1px solid var(--line);
+  box-shadow: 0 0 0 1px #000, 0 18px 50px rgba(0,0,0,0.7); padding: 12px;
+}
+.snk-top { display: flex; align-items: center; gap: 14px; font-size: 20px; letter-spacing: 0.08em; }
+.snk-title { color: var(--blood-hi); flex: 1; }
+.snk-score b, .snk-hi b { color: #ff4a5f; font-weight: normal; }
+.snk-x { background: none; border: 1px solid var(--line); color: var(--bone); font: inherit; font-size: 18px; width: 34px; height: 34px; cursor: pointer; }
+.snk-x:hover { border-color: var(--bone); }
+.snk-screen { position: relative; border: 1px solid #000; box-shadow: inset 0 0 18px rgba(184,23,47,0.35); background: #170306; }
+.snk-screen canvas { display: block; width: 100%; height: auto; image-rendering: pixelated; touch-action: none; }
+.snk-card {
+  position: absolute; inset: 0; overflow: auto; display: flex; flex-direction: column; align-items: center; justify-content: safe center;
+  gap: 6px; padding: 14px; text-align: center; background: rgba(23,3,6,0.9); color: #ff8a98; font-size: 18px; letter-spacing: 0.05em;
+  text-shadow: 0 0 6px rgba(255,74,95,0.5);
+}
+.snk-card[hidden] { display: none; }
+.snk-card p { margin: 0; }
+.snk-big { font-size: 34px; color: #ff4a5f; letter-spacing: 0.12em; }
+.snk-dim { color: #b8606c; font-size: 16px; }
+.snk-go { margin-top: 6px; font-size: 22px; }
+.snk-row { display: flex; gap: 8px; margin-top: 4px; }
+#snk-name { font: inherit; font-size: 20px; color: var(--bone); background: #0d0204; border: 1px solid #6e0d1c; padding: 3px 8px; width: 13em; max-width: 52vw; text-transform: uppercase; }
+#snk-form { display: flex; flex-direction: column; align-items: center; }
+#snk-form[hidden] { display: none; }
+.snk-board { list-style: none; margin: 6px 0 0; padding: 0; width: min(300px, 100%); font-size: 18px; }
+.snk-board li { display: flex; justify-content: space-between; gap: 12px; padding: 1px 0; border-bottom: 1px dotted rgba(255,74,95,0.2); }
+.snk-board li span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.snk-board li b { color: #ff4a5f; font-weight: normal; }
+.snk-board li.me { color: var(--bone); }
+.snk-msg { font-size: 20px; }
+.snk-pad { display: none; grid-template-columns: repeat(3, 64px); grid-template-rows: repeat(2, 48px); gap: 6px; justify-content: center; }
+.snk-pad button {
+  font: inherit; font-size: 22px; color: var(--bone); background: linear-gradient(180deg, #2a2528, #151214);
+  border: 1px solid #000; box-shadow: inset 0 1px 0 rgba(255,255,255,0.12); touch-action: manipulation; -webkit-tap-highlight-color: transparent;
+}
+.snk-pad button:active { background: var(--blood); }
+.snk-pad [data-dir="up"] { grid-column: 2; grid-row: 1; }
+.snk-pad [data-dir="left"] { grid-column: 1; grid-row: 2; }
+.snk-pad [data-dir="down"] { grid-column: 2; grid-row: 2; }
+.snk-pad [data-dir="right"] { grid-column: 3; grid-row: 2; }
+.snk-pad [data-dir="pause"] { grid-column: 3; grid-row: 1; font-size: 18px; }
+@media (hover: none), (max-width: 700px) { .snk-pad { display: grid; } }
+@media (max-width: 600px) {
+  .snk-box { padding: 10px; gap: 8px; }
+  .snk-top { font-size: 18px; gap: 10px; }
+  .snk-card { font-size: 16px; }
+  .snk-big { font-size: 28px; }
+  .snk-msg { font-size: 18px; padding: 6px 10px; }
+  .snk-pad { grid-template-rows: repeat(2, 44px); }
+}
+.snk-sc { position: fixed; left: -9999px; top: 0; width: 1px; height: 1px; overflow: hidden; opacity: 0; pointer-events: none; }
+.snk-sc iframe { width: 300px; height: 120px; border: 0; }

@@ -32,7 +32,7 @@
 <link rel="preload" href="/assets/fonts/unifrakturmaguntia-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/vt323-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/courier-prime-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/assets/site.css?v=20261113">
+<link rel="stylesheet" href="/assets/site.css?v=20261121c">
 <link rel="preconnect" href="https://is1-ssl.mzstatic.com">
 <link rel="preconnect" href="https://w.soundcloud.com">
 </head>
@@ -99,7 +99,7 @@
       <button type="button" class="rec" id="rec" title="Replay the intro" aria-label="Replay the intro"><i></i>REC</button>
       <span class="tc" id="tc">SP 00:00:00</span>
     </div>
-    <a class="osd-mark" href="#top" aria-label="yuusef — back to top"><img src="/img/floppy.gif?v=20261113" alt="yuusef" width="48" height="48"></a>
+    <a class="osd-mark" href="#top" aria-label="yuusef — back to top"><img src="/img/floppy.gif?v=20261121c" alt="yuusef" width="48" height="48"></a>
     <nav aria-label="Sections">
       <a href="#top">SOCIALS</a>
       <a href="#archive">ARCHIVE</a>
@@ -117,7 +117,7 @@
       <div class="cd-stage">
         <div class="cd-wrap">
           <canvas class="cd-ring" id="cd-ring" aria-hidden="true"></canvas>
-        <button type="button" class="cd" id="cd" aria-label="Play">
+        <div class="cd" id="cd" aria-hidden="true">
           <span class="cd-art" id="cd-art" aria-hidden="true"></span>
           <span class="cd-label" aria-hidden="true">
             <span class="l1">yuusef</span>
@@ -125,8 +125,7 @@
             <span class="l2">archive 2023 &ndash; 2026</span>
           </span>
           <span class="cd-hole" aria-hidden="true"></span>
-          <span class="cd-hint" id="cd-hint" aria-hidden="true">&#9654;</span>
-        </button>
+        </div>
         </div>
         <div class="player" id="player">
           <div class="lcd"><span class="scroll" id="p-lcd">LOADING DISC…</span></div>
@@ -373,7 +372,8 @@
 </div>
 
 <script src="/assets/data.js?v=20261115"></script>
-<script src="/assets/app.js?v=20261113"></script>
-<script src="/assets/guestbook.js?v=20261113"></script>
+<script src="/assets/app.js?v=20261121c"></script>
+<script src="/assets/guestbook.js?v=20261121c"></script>
+<script src="/assets/snake.js?v=20261121c"></script>
 </body>
 </html>

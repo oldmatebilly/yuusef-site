@@ -409,14 +409,12 @@ function makeRing(canvas) {
     setArt(rel, artworkUrl);
     lcd.textContent = `${rel && rel.no ? "No." + pad(rel.no) : "SC"} · ${t.toUpperCase()} · YUUSEF`;
     miniTitle.textContent = t;
-    cd.setAttribute("aria-label", (playing ? "Pause " : "Play ") + t);
   }
   function setPlaying(on) {
     playing = on;
     cd.classList.toggle("playing", on);
     ring.setPlaying(on);
     playBtn.innerHTML = on ? "&#10074;&#10074; PAUSE" : "&#9654; PLAY";
-    document.getElementById("cd-hint").innerHTML = on ? "&#10074;&#10074;" : "&#9654;";
     miniPlay.innerHTML = on ? "&#10074;&#10074;" : "&#9654;";
     miniPlay.setAttribute("aria-label", on ? "Pause" : "Play");
     mini.classList.toggle("playing", on);
@@ -459,7 +457,6 @@ function makeRing(canvas) {
     widget.load(POOL[cur].url, Object.assign({}, OPTS, { auto_play: autoplay, callback: () => { readCurrent(); if (autoplay) armFallback(); } }));
   }
 
-  cd.addEventListener("click", toggle);
   playBtn.addEventListener("click", toggle);
   shuf.addEventListener("click", () => next(playing));
   miniPlay.addEventListener("click", toggle);
